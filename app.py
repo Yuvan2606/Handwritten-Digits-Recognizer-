@@ -16,7 +16,7 @@ st.title("Handwritten Digit Recognizer")
 st.write("Upload a digit image (28x28 pixels, black on white background).")
 
 # Upload image
-uploaded_file = st.file_uploader("", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("https://github.com/Yuvan2606/Handwritten-Digits-Recognizer-/blob/main/file_00000000174461f89ec7f2c794fceab4%20(1).png", type=["png", "jpg", "jpeg"])
 
 if uploaded_file is not None:
     # Process the image
