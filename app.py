@@ -1,29 +1,37 @@
-import pandas as pd
+import streamlit as st
 import numpy as np
+from PIL import Image, ImageOps
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
-from tensorflow.keras.utils import to_categorical
 
-# Load data
-df = pd.read_csv("mnist_test.csv")
-X = df.drop("label", axis=1).values / 255.0
-y = to_categorical(df["label"].values, 10)
-X = X.reshape(-1, 28, 28, 1)
+# Load the trained CNN model
+@st.cache_resource
+def load_model():
+    return tf.keras.models.load_model("mnist_cnn_model.h5")
 
-# Build CNN model
-model = Sequential([
-    Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)),
-    MaxPooling2D((2,2)),
-    Conv2D(64, (3,3), activation='relu'),
-    MaxPooling2D((2,2)),
-    Flatten(),
-    Dense(128, activation='relu'),
-    Dropout(0.5),
-    Dense(10, activation='softmax')
-])
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model = load_model()
 
-# Train and save model
-model.fit(X, y, epochs=5, batch_size=128, validation_split=0.2)
-model.save("mnist_cnn_model.h5")
+# Page layout
+st.set_page_config(page_title="Digit Recognizer", layout="centered")
+st.title("Handwritten Digit Recognizer")
+st.write("Upload a digit image (28x28 pixels, black on white background).")
+
+# Upload image
+uploaded_file = st.file_uploader("", type=["png", "jpg", "jpeg"])
+
+if uploaded_file is not None:
+    # Process the image
+    image = Image.open(uploaded_file).convert("L")  # Grayscale
+    image = ImageOps.invert(image)                  # Invert for white digit on black
+    image = image.resize((28, 28))                  # Resize to 28x28
+
+    # Normalize and reshape
+    img_array = np.array(image).astype("float32") / 255.0
+    img_array = img_array.reshape(1, 28, 28, 1)
+
+    # Predict digit
+    prediction = model.predict(img_array)
+    predicted_digit = np.argmax(prediction)
+
+    # Display results
+    st.image(image, caption="Processed Image", width=150)
+    st.subheader(f"Predicted Digit: {predicted_digit}")
