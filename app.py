@@ -5,11 +5,9 @@ import tensorflow as tf
 
 # Load model
 model = tf.keras.models.load_model("mnist_cnn_model.h5")
-
 st.title("Handwritten Digit Recognizer")
 st.write("Upload a digit image (28x28 pixels, black on white)")
-
-uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("https://chatgpt.com/s/m_6824ce688ac48191bdc686c1fd169cb4", type=["png", "jpg", "jpeg"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert('L')
